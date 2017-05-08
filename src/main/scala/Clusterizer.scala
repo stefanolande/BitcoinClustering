@@ -40,17 +40,14 @@ object Clusterizer {
       vertexlist
     })
 
-    val vertices =  verticesWithDup.distinct()
+    val vertices = verticesWithDup.distinct()
 
 
     val edges = rdd.flatMap(tx => {
 
-      val addrSet = heuristic1(tx)
+      val addrSet = heuristic1(tx) ++ heutistic2(tx)
 
-      for {a_ <- addrSet
-           b_ <- addrSet
-           if !a_.equals(b_)
-      } yield Edge(a_.hashCode, b_.hashCode, "")
+      generateEdges(addrSet)
 
     })
 
@@ -68,21 +65,81 @@ object Clusterizer {
 
   }
 
-  def heuristic1(tx: Document) : Set[String] = {
-    val javaInputs = tx.get("vin").asInstanceOf[ArrayList[Document]];
+  /**
+    * Multi-input heuristic.
+    * If a transaction spends coins originating from multiple inputs,
+    * the transaction has to be signed using the appropriate private keys that match the public keys of all inputs.
+    * If we assume that a transaction was executed by one user,
+    * then this user owns all addresses that were included in the inputs of this transaction.
+    * @param tx
+    * @return Set of addresses controlled by the same users
+    */
+  def heuristic1(tx: Document): Set[String] = {
+    val inputs = tx.get("vin").asInstanceOf[ArrayList[Document]] asScala
 
-    val addrList = javaInputs.asScala.flatMap(input => {
+    val addrList = inputs.flatMap(input => {
 
       val addr = input.getString("address")
       if (addr != null && !"".equals(addr)) {
         Set(addr)
-      } else Set("")
+      } else Set[String]()
     })
 
     val addrSet = addrList.toSet
 
-    return addrSet - ("")
+    return addrSet
 
+  }
+
+  /**
+    * Bridge transaction heuristic.
+    * We assume that a transaction with no change output is not probably used to move bitcoins
+    * from a user to another, but rather to move funds from an address to another,
+    * both controlled by the same users.
+    * The transaction must have only one input and one output.
+    * @param tx
+    * @return Set of addresses controlled by the same users
+    */
+  def heutistic2(tx: Document): Set[String] = {
+    val inputs = tx.get("vin").asInstanceOf[ArrayList[Document]].asScala
+    val outputs = tx.get("vout").asInstanceOf[ArrayList[Document]].asScala
+
+
+    if (inputs.size == 1 && outputs.size == 1) {
+
+      val inputAddr = inputs.apply(0).getString("address")
+      val outputAddresses = outputs.apply(0).get("address")
+
+      if (inputAddr != null && outputAddresses != null) {
+
+        val inputSet = Set(inputAddr)
+
+        val outputaddr = outputAddresses.asInstanceOf[ArrayList[String]].asScala
+
+        val outputSet = outputaddr.foldLeft(inputSet) {
+          (acc, addr) =>
+            return acc + addr
+        }
+
+        return outputSet
+      }
+    }
+
+    return Set[String]()
+
+  }
+
+  /**
+    * Given a set of addresses, each of them in relation to each other,
+    * returns a Set of edges (address_1, address_2)
+    * @param addrSet
+    * @return Set of edges (address_1, address_2)
+    */
+  def generateEdges(addrSet: Set[String]): Set[Edge[String]] = {
+    for {a_ <- addrSet
+         b_ <- addrSet
+         if !a_.equals(b_)
+    } yield Edge(a_.hashCode, b_.hashCode, "")
   }
 
 }
