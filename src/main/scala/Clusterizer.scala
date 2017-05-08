@@ -2,19 +2,21 @@
 
 import java.util.ArrayList
 
-import org.apache.spark.{SparkConf, SparkContext}
 import com.mongodb.spark._
-import org.bson.Document
 import org.apache.spark.graphx._
+import org.apache.spark.{SparkConf, SparkContext}
+import org.bson.Document
+
 import scala.collection.JavaConverters._
 
 
 object Clusterizer {
+
   def main(args: Array[String]) {
 
     val conf = new SparkConf().setAppName("Clusterizer")
-      .set("spark.mongodb.input.uri", "mongodb://lanser:nakamotocatenE@127.0.0.1/blockchain.transaction_test")
-      .set("spark.mongodb.output.uri", "mongodb://lanser:nakamotocatenE@127.0.0.1/blockchain.transaction_test")
+      .set("spark.mongodb.input.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
+      .set("spark.mongodb.output.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
     val sc = new SparkContext(conf)
 
 
@@ -59,11 +61,23 @@ object Clusterizer {
       case (id, (addr, clusterId)) => (addr, clusterId)
     }
 
-    val d = ccByAddr.sortBy(_._2)
+    val identities = sc.textFile("hdfs://192.167.155.71:9000/stefano.lande/identities.txt").map { line =>
+      val fields = line.split(" ")
+      (fields(0), fields(1))
+    }
 
-    println(d.collect().mkString("\n"))
+    val tagged = ccByAddr.leftOuterJoin(identities).map {
+      case (addr, (clusterId, None)) => (addr, clusterId, "")
+      case (addr, (clusterId, Some(tag))) => (addr, clusterId, tag)
+    }
+
+    val d = tagged.sortBy(_._2)
+
+    d.saveAsTextFile("hdfs://192.167.155.71:9000/stefano.lande/clusters.txt")
 
   }
+
+  def MONGO_AUTH_ENABLED = false
 
   /**
     * Multi-input heuristic.
@@ -77,15 +91,16 @@ object Clusterizer {
   def heuristic1(tx: Document): Set[String] = {
     val inputs = tx.get("vin").asInstanceOf[ArrayList[Document]] asScala
 
-    val addrList = inputs.flatMap(input => {
+    val addrSet = inputs.foldLeft(Set[String]()) {
+      (acc, input) =>
 
-      val addr = input.getString("address")
-      if (addr != null && !"".equals(addr)) {
-        Set(addr)
-      } else Set[String]()
-    })
+        val addr = input.getString("address")
+        if (addr != null && !"".equals(addr)) {
+          acc + addr
+        } else acc
 
-    val addrSet = addrList.toSet
+    }
+
 
     return addrSet
 
