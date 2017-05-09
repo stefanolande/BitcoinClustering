@@ -9,9 +9,9 @@ libraryDependencies += "org.apache.spark" % "spark-core_2.10" % "1.6.0" % "provi
 // https://mvnrepository.com/artifact/org.mongodb.spark/mongo-spark-connector_2.11
 libraryDependencies += "org.mongodb.spark" % "mongo-spark-connector_2.10" % "1.1.0"
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql_2.10
-libraryDependencies += "org.apache.spark" % "spark-sql_2.10" % "1.6.0"
+libraryDependencies += "org.apache.spark" % "spark-sql_2.10" % "1.6.0" % "provided"
 // https://mvnrepository.com/artifact/org.apache.spark/spark-graphx_2.10
-libraryDependencies += "org.apache.spark" % "spark-graphx_2.10" % "1.6.0"
+libraryDependencies += "org.apache.spark" % "spark-graphx_2.10" % "1.6.0" % "provided"
 
 
 assemblyMergeStrategy in assembly := {

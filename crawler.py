@@ -87,7 +87,7 @@ try:
        if row[1].startswith(cut):
           row[1] = (row[1])[:len(cut)]
 
-      line = row[0] + " " + row[1]
+      line = row[0] + ", " + row[1]
       outfile.write(line.encode('utf-8').strip() + "\n")
 except Exception:
     pass

@@ -19,7 +19,6 @@ object Clusterizer {
       .set("spark.mongodb.output.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
     val sc = new SparkContext(conf)
 
-
     //carico la collection mongo in un rdd
     val rdd = MongoSpark.load(sc)
 
@@ -62,7 +61,7 @@ object Clusterizer {
     }
 
     val identities = sc.textFile("hdfs://192.167.155.71:9000/stefano.lande/identities.txt").map { line =>
-      val fields = line.split(" ")
+      val fields = line.split(",")
       (fields(0), fields(1))
     }
 
