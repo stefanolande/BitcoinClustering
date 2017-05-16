@@ -46,7 +46,7 @@ object Clusterizer {
 
     val edges = rdd.flatMap(tx => {
 
-      val addrSet = heuristic1(tx) ++ heutistic2(tx)
+      val addrSet = heuristic1(tx) ++ heuristic2(tx)
 
       generateEdges(addrSet)
 
@@ -60,7 +60,7 @@ object Clusterizer {
       case (id, (addr, clusterId)) => (addr, clusterId)
     }
 
-    val identities = sc.textFile("hdfs://192.167.155.71:9000/stefano.lande/identities.txt").map { line =>
+    val identities = sc.textFile(Settings.HDFS_DIR + "identities.txt").map { line =>
       val fields = line.split(",")
       (fields(0), fields(1))
     }
@@ -70,9 +70,32 @@ object Clusterizer {
       case (addr, (clusterId, Some(tag))) => (addr, clusterId, tag)
     }
 
-    val d = tagged.sortBy(_._2)
+    val outAll = tagged.sortBy(_._2)
 
-    d.saveAsTextFile("hdfs://192.167.155.71:9000/stefano.lande/clusters.txt")
+    outAll.saveAsTextFile(Settings.HDFS_OUT + "clustersAll.txt")
+
+
+    //Get only the clusters with at least one tag
+    val onlyAddrTagged = ccByAddr.join(identities).map {
+      case (addr, (clusterId, tag)) => (addr, clusterId, tag)
+    }
+
+    onlyAddrTagged.saveAsTextFile(Settings.HDFS_OUT + "onlytagged.txt")
+
+    val ccByAddrRev = ccByAddr.map {
+      case (addr, clusterId) => (clusterId, addr)
+    }
+
+    val onlyAddrTaggedRev = onlyAddrTagged.map {
+      case (addr, clusterId, tag) => (clusterId, (addr, tag))
+    }
+
+    val onlyClustersTagged = ccByAddrRev.join(onlyAddrTaggedRev).map {
+      case (clusterId, (addr, (addr1, tag))) => (addr, clusterId, tag)
+    }
+
+
+    onlyClustersTagged.sortBy(_._2).saveAsTextFile(Settings.HDFS_OUT + "clustersOnlyTagged.txt")
 
   }
 
@@ -84,6 +107,7 @@ object Clusterizer {
     * the transaction has to be signed using the appropriate private keys that match the public keys of all inputs.
     * If we assume that a transaction was executed by one user,
     * then this user owns all addresses that were included in the inputs of this transaction.
+    *
     * @param tx
     * @return Set of addresses controlled by the same users
     */
@@ -111,10 +135,11 @@ object Clusterizer {
     * from a user to another, but rather to move funds from an address to another,
     * both controlled by the same users.
     * The transaction must have only one input and one output.
+    *
     * @param tx
     * @return Set of addresses controlled by the same users
     */
-  def heutistic2(tx: Document): Set[String] = {
+  def heuristic2(tx: Document): Set[String] = {
     val inputs = tx.get("vin").asInstanceOf[ArrayList[Document]].asScala
     val outputs = tx.get("vout").asInstanceOf[ArrayList[Document]].asScala
 
@@ -146,6 +171,7 @@ object Clusterizer {
   /**
     * Given a set of addresses, each of them in relation to each other,
     * returns a Set of edges (address_1, address_2)
+    *
     * @param addrSet
     * @return Set of edges (address_1, address_2)
     */
