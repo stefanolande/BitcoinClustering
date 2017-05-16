@@ -91,7 +91,10 @@ object Clusterizer {
     }
 
     val onlyClustersTagged = ccByAddrRev.join(onlyAddrTaggedRev).map {
-      case (clusterId, (addr, (addr1, tag))) => (addr, clusterId, tag)
+      case (clusterId, (addr, (addr1, tag))) => (addr, clusterId)
+    }.leftOuterJoin(identities).map {
+      case (addr, (clusterId, None)) => (addr, clusterId, "")
+      case (addr, (clusterId, Some(tag))) => (addr, clusterId, tag)
     }
 
 
