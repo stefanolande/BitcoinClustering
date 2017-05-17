@@ -82,21 +82,33 @@ object Clusterizer {
 
     onlyAddrTagged.saveAsTextFile(Settings.HDFS_OUT + "onlytagged.txt")
 
-    val ccByAddrRev = ccByAddr.map {
+
+    //First, we filter the clusters with only one address
+    val ccRev = ccByAddr.map {
       case (addr, clusterId) => (clusterId, addr)
     }
 
+    val ccRevWOSingles = ccByAddr.map {
+      case (addr, clusterId) => (clusterId, 1)
+    }.reduceByKey((a, b) => a+b)
+    .filter(_._2 > 1)
+    .join(ccRev).map{
+      case (clusterId, (num, addr)) => (clusterId, addr)
+    }
+
+
+    //then, we join back the filtered clusters with the original one
     val onlyAddrTaggedRev = onlyAddrTagged.map {
       case (addr, clusterId, tag) => (clusterId, (addr, tag))
     }
 
-    val onlyClustersTagged = ccByAddrRev.join(onlyAddrTaggedRev).map {
+
+    val onlyClustersTagged = ccRevWOSingles.join(onlyAddrTaggedRev).map {
       case (clusterId, (addr, (addr1, tag))) => (addr, clusterId)
     }.leftOuterJoin(identities).map {
       case (addr, (clusterId, None)) => (addr, clusterId, "")
       case (addr, (clusterId, Some(tag))) => (addr, clusterId, tag)
     }
-
 
     onlyClustersTagged.sortBy(_._2).saveAsTextFile(Settings.HDFS_OUT + "clustersOnlyTagged.txt")
 
