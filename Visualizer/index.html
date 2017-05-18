@@ -1667,7 +1667,7 @@ var nodes = new vis.DataSet([
 	}
 }    
 var network = new vis.Network(container, data, options);
-cIds.forEach(function(id) {
+var map = { "1": "754", "756": "51", "808": "5",};cIds.forEach(function(id) {
     network.clusterByConnection(id)
 
 });  network.on("selectNode", function(params) {

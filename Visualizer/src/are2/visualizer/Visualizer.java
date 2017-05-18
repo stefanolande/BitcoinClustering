@@ -1,6 +1,8 @@
 package are2.visualizer;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lande on 17/05/2017.
@@ -8,6 +10,8 @@ import java.io.*;
 public class Visualizer {
     public static void main(String[] args) {
         StringBuilder page = new StringBuilder();
+
+        Map<Integer, Integer> nodesInCluster = new HashMap<>();
 
         page.append("<html>\n" +
                 "<head>\n" +
@@ -68,6 +72,7 @@ public class Visualizer {
                     cIds.append("'" + lastClusrNodeId + "', ");
                 }
 
+                nodesInCluster.merge(lastClusrNodeId, 1, Integer::sum);
 
                 nodes.append("{id: " + (id++) + ", label: '" +
                         address.substring(0, 7) + tag + "', title: '" + address + "', " +
@@ -116,11 +121,18 @@ public class Visualizer {
                 "    timestep: 0.35\n" +
                 "\t}\n" +
                 "}    \n" +
-                "var network = new vis.Network(container, data, options);\n" +
-                "cIds.forEach(function(id) {\n" +
-                        "    network.clusterByConnection(id)\n" +
-                        "\n" +
-                        "});" +
+                "var network = new vis.Network(container, data, options);\n");
+
+        page.append("var map = {");
+        for (int clusterId : nodesInCluster.keySet()){
+            page.append(" \"" + clusterId + "\": \"" + nodesInCluster.get(clusterId) + "\",");
+        }
+        page.append("};");
+
+        page.append("cIds.forEach(function(id) {\n" +
+                "    network.clusterByConnection(id)\n" +
+                "\n" +
+                "});" +
                 "  network.on(\"selectNode\", function(params) {\n" +
                 "      if (params.nodes.length == 1) {\n" +
                 "          if (network.isCluster(params.nodes[0]) == true) {\n" +
@@ -133,6 +145,7 @@ public class Visualizer {
                 "</script>\n" +
                 "</body>\n" +
                 "</html>");
+
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("index.html"))) {
             bw.write(page.toString());
