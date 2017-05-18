@@ -31,6 +31,9 @@ public class Visualizer {
         StringBuilder edges = new StringBuilder();
         edges.append(" var edges = new vis.DataSet([\n");
 
+        StringBuilder cIds = new StringBuilder();
+        cIds.append(" var cIds = [");
+
         try (BufferedReader reader = new BufferedReader(new FileReader("clustersOnlyTagged.txt"))) {
             String line;
 
@@ -59,12 +62,16 @@ public class Visualizer {
 
                     lastClusrNodeId = id;
                     nodes.append("{id: " + (id++) + ", label: 'Cluster " +
-                            (clusterCounter++) + "' , color: '#2d7ce7'},\n");
+                            (clusterCounter++) + "' , color: '#2d7ce7', " +
+                            "cid: " + lastClusrNodeId +"},\n");
+
+                    cIds.append("'" + lastClusrNodeId + "', ");
                 }
 
 
                 nodes.append("{id: " + (id++) + ", label: '" +
-                        address.substring(0, 7) + tag + "', title: '" + address + "'},\n");
+                        address.substring(0, 7) + tag + "', title: '" + address + "', " +
+                        "cid: " + lastClusrNodeId +"},\n");
 
 
                 edges.append("{from: " + lastClusrNodeId + ", to: " + (id - 1) + "},\n");
@@ -79,9 +86,11 @@ public class Visualizer {
 
         nodes.append("]);\n");
         edges.append("]);\n");
+        cIds.append("];\n");
 
         page.append(nodes);
         page.append(edges);
+        page.append(cIds);
         page.append("    var container = document.getElementById('mynetwork');\n" +
                 "    var data = {\n" +
                 "        nodes: nodes,\n" +
@@ -108,6 +117,19 @@ public class Visualizer {
                 "\t}\n" +
                 "}    \n" +
                 "var network = new vis.Network(container, data, options);\n" +
+                "cIds.forEach(function(id) {\n" +
+                        "    network.clusterByConnection(id)\n" +
+                        "\n" +
+                        "});" +
+                "  network.on(\"selectNode\", function(params) {\n" +
+                "      if (params.nodes.length == 1) {\n" +
+                "          if (network.isCluster(params.nodes[0]) == true) {\n" +
+                "              network.openCluster(params.nodes[0]);\n" +
+                "} else {\n" +
+                "          \tnetwork.clusterByConnection(params.nodes[0])\n" +
+                "          }" +
+                "      }\n" +
+                "  });" +
                 "</script>\n" +
                 "</body>\n" +
                 "</html>");
