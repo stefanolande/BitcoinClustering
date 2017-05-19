@@ -1,20 +1,20 @@
 <html>
 <head>
-    <script type="text/javascript" src="vis.js"></script>
-    <link href="vis.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="vis.js"></script>
+	<link href="vis.css" rel="stylesheet" type="text/css" />
 
-    <style type="text/css">
-        #mynetwork {
-            border: 1px solid lightgray;
-        }
-    </style>
+	<style type="text/css">
+		#mynetwork {
+			border: 1px solid lightgray;
+		}
+	</style>
 </head>
 <body>
-<div id="mynetwork"></div>
+	<div id="mynetwork"></div>
 
-<script type="text/javascript">
+	<script type="text/javascript">
 var nodes = new vis.DataSet([
-{id: 1, label: 'Cluster 1' , color: '#2d7ce7', cid: 1},
+{id: 1, label: 'Cluster 1' , color: '#2d7ce7', cid: 1, font: {color: 'white'}},
 {id: 2, label: '17kNMjW', title: '17kNMjWR2nKTvHXKDHYLqics8P2nYaU2aJ', cid: 1},
 {id: 3, label: '146BZyY', title: '146BZyYZmCz16Asrw9xiqpF5Seca8UGNqV', cid: 1},
 {id: 4, label: '1MPsQHC', title: '1MPsQHCmLzGwLXGh761T6PuRxvh4KuyDMB', cid: 1},
@@ -220,7 +220,7 @@ var nodes = new vis.DataSet([
 {id: 204, label: '1FJ1SXT', title: '1FJ1SXTCE7ukwHbm8vojEzmbWNssnARt6p', cid: 1},
 {id: 205, label: '1Kmz9R2', title: '1Kmz9R2QMxHnnnpRu2kMDj1QpVMmjS4XA4', cid: 1},
 {id: 206, label: '1Doovow', title: '1DoovowFkNZ68WCPmdRL46yps53A17TyCi', cid: 1},
-{id: 207, label: '1Q1Vh8M\n  OpenGameArt', title: '1Q1Vh8Mfr2yNeDogtJWNLMZCdxteCwbueE', cid: 1},
+{id: 207, label: '1Q1Vh8M\n  OpenGameArt', title: '1Q1Vh8Mfr2yNeDogtJWNLMZCdxteCwbueE', cid: 1, color: '#FF8141'},
 {id: 208, label: '1B8Dgkq', title: '1B8Dgkq4UtwVofQHN9TCay5ENfEz3k7Kbt', cid: 1},
 {id: 209, label: '1Jfz35J', title: '1Jfz35JognNZRLAKbp8BnCuUWMmExQotf7', cid: 1},
 {id: 210, label: '19Fza6J', title: '19Fza6JjWHEKgYiUQt2m1PUCrEvSM5yGbP', cid: 1},
@@ -769,7 +769,7 @@ var nodes = new vis.DataSet([
 {id: 753, label: '1Q6ukeE', title: '1Q6ukeEhBMMgXAt8uvZWaozkDr7oYQx5pQ', cid: 1},
 {id: 754, label: '1JdSYLp', title: '1JdSYLpLeY9qUuJwWBoAde4xEvHgEET63v', cid: 1},
 {id: 755, label: '1LQaWSw', title: '1LQaWSw86qkX8ABQ69FoSGicfhuBwrtsfR', cid: 1},
-{id: 756, label: 'Cluster 2' , color: '#2d7ce7', cid: 756},
+{id: 756, label: 'Cluster 2' , color: '#2d7ce7', cid: 756, font: {color: 'white'}},
 {id: 757, label: '15HU9cB', title: '15HU9cBHuvxC5nvqzNara92Y8i2sSn3UGK', cid: 756},
 {id: 758, label: '1Ghssn4', title: '1Ghssn4tz9SDFYs51uq5SdvvezbEm3pCJg', cid: 756},
 {id: 759, label: '1J15yNW', title: '1J15yNWTk25Ucc2Yd1Rj9gujSVa7W7pRhp', cid: 756},
@@ -816,15 +816,15 @@ var nodes = new vis.DataSet([
 {id: 800, label: '1Hh9bc1', title: '1Hh9bc1v6t3W7xHAE7yT3wEMaAptxLaZ5H', cid: 756},
 {id: 801, label: '1KJ5TxK', title: '1KJ5TxKHxXwsaNeaFKbsMLQBuKabXxAYUt', cid: 756},
 {id: 802, label: '18qYu62', title: '18qYu62H2DvEosZQY8xtr1FVLKMeFzuRRy', cid: 756},
-{id: 803, label: '15VjRaD\n  faucet donation', title: '15VjRaDX9zpbA8LVnbrCAFzrVzN7ixHNsC', cid: 756},
+{id: 803, label: '15VjRaD\n  faucet donation', title: '15VjRaDX9zpbA8LVnbrCAFzrVzN7ixHNsC', cid: 756, color: '#FF8141'},
 {id: 804, label: '1Jwhsc5', title: '1Jwhsc5Q3UNvu5uJV41PLXMvi3N9MDU6hw', cid: 756},
 {id: 805, label: '17ZJzxi', title: '17ZJzxisNPDGP6V2B2S9DPNFvrB7DjWQNE', cid: 756},
 {id: 806, label: '1HcmrCg', title: '1HcmrCgeP14ugPx642Xr2KU7bVyiLgJHdv', cid: 756},
 {id: 807, label: '1AZc5GQ', title: '1AZc5GQ77HuwJGNZ9m1S4ywFayqjt1uWKk', cid: 756},
-{id: 808, label: 'Cluster 3' , color: '#2d7ce7', cid: 808},
+{id: 808, label: 'Cluster 3' , color: '#2d7ce7', cid: 808, font: {color: 'white'}},
 {id: 809, label: '13TqkNJ', title: '13TqkNJoS3KXiqwsSxBttwhZkujgJe8Qqw', cid: 808},
 {id: 810, label: '1NXYoJ5', title: '1NXYoJ5xU91Jp83XfVMHwwTUyZFK64BoAD', cid: 808},
-{id: 811, label: '1Cvvr8A\n  Blockexplorer.com', title: '1Cvvr8AsCfbbVQ2xoWiFD1Gb2VRbGsEf28', cid: 808},
+{id: 811, label: '1Cvvr8A\n  Blockexplorer.com', title: '1Cvvr8AsCfbbVQ2xoWiFD1Gb2VRbGsEf28', cid: 808, color: '#FF8141'},
 {id: 812, label: '1ChKws8', title: '1ChKws8paz5CCzDxcrbG487GAwsEYLka3e', cid: 808},
 {id: 813, label: '1BCjRvG', title: '1BCjRvGj29u8iXbjNgZs6RJGiLKXcTBmSw', cid: 808},
 ]);
@@ -1641,42 +1641,54 @@ var nodes = new vis.DataSet([
 {from: 808, to: 813},
 ]);
  var cIds = ['1', '756', '808', ];
-    var container = document.getElementById('mynetwork');
-    var data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var options = {
-      nodes: {
-        shape: 'circle'
-    	},
-   	   physics: {
-        barnesHut: {
-          gravitationalConstant: -5000,
-          centralGravity: 1,
-          damping : 0.3
-        },
-      stabilization: {
-      enabled: true,
-      iterations: 100,
-      updateInterval: 100,
-      onlyDynamicEdges: false,
-      fit: true,
-    },
-    timestep: 0.35
+var container = document.getElementById('mynetwork');
+var data = {
+	nodes: nodes,
+	edges: edges
+};
+var options = {
+	nodes: {
+		shape: 'circle'
+	},
+	physics: {
+		barnesHut: {
+			gravitationalConstant: -10000,
+			centralGravity: 0.1,
+			damping : 0.3
+		},
+		stabilization: {
+			enabled: true,
+			iterations: 50,
+			updateInterval: 100,
+			onlyDynamicEdges: false,
+			fit: true,
+		},
+		timestep: 0.35
 	}
 }    
-var network = new vis.Network(container, data, options);
-var map = { "1": "754", "756": "51", "808": "5",};cIds.forEach(function(id) {
-    network.clusterByConnection(id)
+var network = new vis.Network(container, data, options);var map = { "1": "754", "756": "51", "808": "5",};cIds.forEach(function(id) {
 
-});  network.on("selectNode", function(params) {
-      if (params.nodes.length == 1) {
-          if (network.isCluster(params.nodes[0]) == true) {
-              network.openCluster(params.nodes[0]);
-} else {
-          	network.clusterByConnection(params.nodes[0])
-          }      }
-  });</script>
+	var clusterOptions = {
+		clusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \n size '+map[id], borderWidth:3, color: '#2d7ce7', 
+		font: {size: 25 * Math.ceil(Math.log10(map[id])), color: 'white'} }          
+	};
+	network.clusterByConnection(id, clusterOptions)
+
+});  
+network.on("selectNode", function(params) {
+	var id = params.nodes[0]
+	if (params.nodes.length == 1) {
+		if (network.isCluster(id) == true) {
+			network.openCluster(id);
+		} else {	
+			var clusterOptions = {
+				clusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \n size '+map[id], borderWidth:3, color: '#2d7ce7', 
+		font: {size: 25 * Math.ceil(Math.log10(map[id])), color: 'white'} } 
+			};
+			network.clusterByConnection(id, clusterOptions)
+		}      
+	}
+});
+</script>
 </body>
 </html>
