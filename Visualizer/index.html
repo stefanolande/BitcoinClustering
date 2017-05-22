@@ -1666,11 +1666,37 @@ var options = {
 		timestep: 0.35
 	}
 }    
+var network = new vis.Network(container, data, options);var map = { "1": "754", "756": "51", "808": "5",};var cIds = ['1', '756', '808', ];
+var container = document.getElementById('mynetwork');
+var data = {
+	nodes: nodes,
+	edges: edges
+};
+var options = {
+	nodes: {
+		shape: 'circle'
+	},
+	physics: {
+		barnesHut: {
+			gravitationalConstant: -10000,
+			centralGravity: 0.1,
+			damping : 0.3
+		},
+		stabilization: {
+			enabled: true,
+			iterations: 50,
+			updateInterval: 100,
+			onlyDynamicEdges: false,
+			fit: true,
+		},
+		timestep: 0.35
+	}
+}    
 var network = new vis.Network(container, data, options);var map = { "1": "754", "756": "51", "808": "5",};cIds.forEach(function(id) {
 
 	var clusterOptions = {
-		clusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \n size '+map[id], borderWidth:3, color: '#2d7ce7', 
-		font: {size: 25 * Math.ceil(Math.log10(map[id])), color: 'white'} }          
+		clusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \n size '+map[id], borderWidth:3, color: '#a8ffc1', 
+		font: {size: 25 * Math.ceil(Math.log10(map[id])), color: '#003399'}, margin: 20}          
 	};
 	network.clusterByConnection(id, clusterOptions)
 
@@ -1682,8 +1708,8 @@ network.on("selectNode", function(params) {
 			network.openCluster(id);
 		} else {	
 			var clusterOptions = {
-				clusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \n size '+map[id], borderWidth:3, color: '#2d7ce7', 
-		font: {size: 25 * Math.ceil(Math.log10(map[id])), color: 'white'} } 
+				clusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \n size '+map[id], borderWidth:3, color: '#a8ffc1', 
+		font: {size: 25 * Math.ceil(Math.log10(map[id])), color: '#003399'}, margin: 20} 
 			};
 			network.clusterByConnection(id, clusterOptions)
 		}      

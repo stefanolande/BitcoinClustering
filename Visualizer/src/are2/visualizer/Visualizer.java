@@ -131,11 +131,37 @@ public class Visualizer {
         }
         page.append("};");
 
-        page.append("cIds.forEach(function(id) {\n" +
+        page.append("var cIds = ['1', '756', '808', ];\n" +
+                "var container = document.getElementById('mynetwork');\n" +
+                "var data = {\n" +
+                "\tnodes: nodes,\n" +
+                "\tedges: edges\n" +
+                "};\n" +
+                "var options = {\n" +
+                "\tnodes: {\n" +
+                "\t\tshape: 'circle'\n" +
+                "\t},\n" +
+                "\tphysics: {\n" +
+                "\t\tbarnesHut: {\n" +
+                "\t\t\tgravitationalConstant: -10000,\n" +
+                "\t\t\tcentralGravity: 0.1,\n" +
+                "\t\t\tdamping : 0.3\n" +
+                "\t\t},\n" +
+                "\t\tstabilization: {\n" +
+                "\t\t\tenabled: true,\n" +
+                "\t\t\titerations: 50,\n" +
+                "\t\t\tupdateInterval: 100,\n" +
+                "\t\t\tonlyDynamicEdges: false,\n" +
+                "\t\t\tfit: true,\n" +
+                "\t\t},\n" +
+                "\t\ttimestep: 0.35\n" +
+                "\t}\n" +
+                "}    \n" +
+                "var network = new vis.Network(container, data, options);var map = { \"1\": \"754\", \"756\": \"51\", \"808\": \"5\",};cIds.forEach(function(id) {\n" +
                 "\n" +
                 "\tvar clusterOptions = {\n" +
-                "\t\tclusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \\n size '+map[id], borderWidth:3, color: '#2d7ce7', \n" +
-                "\t\tfont: {size: 25 * Math.ceil(Math.log10(map[id])), color: 'white'} }          \n" +
+                "\t\tclusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \\n size '+map[id], borderWidth:3, color: '#a8ffc1', \n" +
+                "\t\tfont: {size: 25 * Math.ceil(Math.log10(map[id])), color: '#003399'}, margin: 20}          \n" +
                 "\t};\n" +
                 "\tnetwork.clusterByConnection(id, clusterOptions)\n" +
                 "\n" +
@@ -147,8 +173,8 @@ public class Visualizer {
                 "\t\t\tnetwork.openCluster(id);\n" +
                 "\t\t} else {\t\n" +
                 "\t\t\tvar clusterOptions = {\n" +
-                "\t\t\t\tclusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \\n size '+map[id], borderWidth:3, color: '#2d7ce7', \n" +
-                "\t\tfont: {size: 25 * Math.ceil(Math.log10(map[id])), color: 'white'} } \n" +
+                "\t\t\t\tclusterNodeProperties: {id: 'cluster'+id, label: 'Cluster \\n size '+map[id], borderWidth:3, color: '#a8ffc1', \n" +
+                "\t\tfont: {size: 25 * Math.ceil(Math.log10(map[id])), color: '#003399'}, margin: 20} \n" +
                 "\t\t\t};\n" +
                 "\t\t\tnetwork.clusterByConnection(id, clusterOptions)\n" +
                 "\t\t}      \n" +
