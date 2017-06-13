@@ -15,13 +15,18 @@ object Clusterizer {
   def main(args: Array[String]) {
 
     val conf = new SparkConf().setAppName("Clusterizer")
-      .set("spark.mongodb.input.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
-      .set("spark.mongodb.output.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
+      .set("spark.mongodb.input.uri", Settings.getMongoUri(IS_MONGO_AUTH_ENABLED))
+      .set("spark.mongodb.output.uri", Settings.getMongoUri(IS_MONGO_AUTH_ENABLED))
+      .set("spark.cores.max", "12")
+      .set("cores", "12")
+      .set("spark.executor.heartbeatInterval", "30s")
+      .set("spark.driver.memory", "6G")
+      .set("spark.executor.memory", "6G")
+
     val sc = new SparkContext(conf)
 
     //carico la collection mongo in un rdd
     val rdd = MongoSpark.load(sc)
-
 
     //scorro l'rdd per creare i vertici del grafo
     val verticesWithDup = rdd.flatMap(tx => {
@@ -90,9 +95,9 @@ object Clusterizer {
 
     val ccRevWOSingles = ccByAddr.map {
       case (addr, clusterId) => (clusterId, 1)
-    }.reduceByKey((a, b) => a+b)
-    .filter(_._2 > 1)
-    .join(ccRev).map{
+    }.reduceByKey((a, b) => a + b)
+      .filter(_._2 > 1)
+      .join(ccRev).map {
       case (clusterId, (num, addr)) => (clusterId, addr)
     }
 
@@ -114,7 +119,7 @@ object Clusterizer {
 
   }
 
-  def MONGO_AUTH_ENABLED = false
+  def IS_MONGO_AUTH_ENABLED = false
 
   /**
     * Multi-input heuristic.

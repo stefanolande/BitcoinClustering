@@ -4,9 +4,9 @@
 object Settings {
   private val MONGO_USERNAME = "lanser"
   private val MONGO_PASSWORD = "nakamotocatenE"
-  private val MONGO_HOST = "localhost";
+  private val MONGO_HOST = "192.167.155.71:27018"
   private val MONGO_DB = "blockchain"
-  private val MONGO_COL = "transaction_test"
+  private val MONGO_COL = "transaction"
 
   def HDFS_DIR = "hdfs://192.167.155.71:9000/stefano.lande/"
   def HDFS_OUT = "hdfs://192.167.155.71:9000/stefano.lande/out/"
