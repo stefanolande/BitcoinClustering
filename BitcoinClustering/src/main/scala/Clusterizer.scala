@@ -15,10 +15,10 @@ object Clusterizer {
   def main(args: Array[String]) {
 
     val conf = new SparkConf().setAppName("Clusterizer")
-      .set("spark.mongodb.input.uri", Settings.getMongoUri(IS_MONGO_AUTH_ENABLED))
-      .set("spark.mongodb.output.uri", Settings.getMongoUri(IS_MONGO_AUTH_ENABLED))
-      .set("spark.cores.max", "12")
-      .set("cores", "12")
+      .set("spark.mongodb.input.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
+      .set("spark.mongodb.output.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
+      .set("spark.cores.max", "4")
+      .set("cores", "4")
       .set("spark.executor.heartbeatInterval", "30s")
       .set("spark.driver.memory", "6G")
       .set("spark.executor.memory", "6G")
@@ -27,6 +27,10 @@ object Clusterizer {
 
     //carico la collection mongo in un rdd
     val rdd = MongoSpark.load(sc)
+
+    val total_cores = conf.getInt("spark.executor.instances", 1) * conf.getInt("sc._conf.get('spark.executor.cores", 1)
+    rdd.coalesce(total_cores * 3)
+
 
     //scorro l'rdd per creare i vertici del grafo
     val verticesWithDup = rdd.flatMap(tx => {
@@ -57,7 +61,7 @@ object Clusterizer {
 
     })
 
-    val btcGraph = Graph(vertices, edges)
+    val btcGraph = Graph(vertices, edges, "")
 
     val cc = btcGraph.connectedComponents().vertices
 
@@ -119,7 +123,7 @@ object Clusterizer {
 
   }
 
-  def IS_MONGO_AUTH_ENABLED = false
+  def MONGO_AUTH_ENABLED = false
 
   /**
     * Multi-input heuristic.
