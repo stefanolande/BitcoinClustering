@@ -48,7 +48,7 @@ object Clusterizer {
           }
       }
       vertexlist
-    })
+    }).filter(_._2 != null)
 
     val vertices = verticesWithDup.distinct()
 
