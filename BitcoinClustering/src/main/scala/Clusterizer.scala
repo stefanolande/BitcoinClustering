@@ -63,7 +63,7 @@ object Clusterizer {
 
     val btcGraph = Graph(vertices, edges, "")
 
-    val cc = btcGraph.connectedComponents().vertices
+    val cc = RobustConnectedComponents.run(btcGraph, dir=Settings.HDFS_OUT)._1.vertices
 
     val ccByAddr = vertices.join(cc).map {
       case (id, (addr, clusterId)) => (addr, clusterId)
