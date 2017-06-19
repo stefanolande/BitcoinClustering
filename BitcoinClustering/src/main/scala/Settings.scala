@@ -6,7 +6,7 @@ object Settings {
   private val MONGO_PASSWORD = "nakamotocatenE"
   private val MONGO_HOST = "10.0.2.2";
   private val MONGO_DB = "blockchain"
-  private val MONGO_COL = "transaction"
+  private val MONGO_COL = "transaction1"
 
   //  def HDFS_DIR = "hdfs://192.167.155.71:9000/stefano.lande/"
   //  def HDFS_OUT = "hdfs://192.167.155.71:9000/stefano.lande/out/"

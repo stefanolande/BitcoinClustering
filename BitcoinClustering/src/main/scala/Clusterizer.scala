@@ -36,19 +36,24 @@ object Clusterizer {
     val verticesWithDup = rdd.flatMap(tx => {
 
       //data una transazione tx, ne prendo tutti gli input
-      val inputs = tx.get("vin").asInstanceOf[ArrayList[Document]].asScala;
+      val inputs = tx.get("vin")
 
-      val vertexlist = inputs.foldLeft(Set[(VertexId, String)]()) {
-        (acc, input) =>
-          val addr = input.getString("address")
-          if (addr != null) {
-            acc + ((addr.hashCode, addr))
-          } else {
-            acc
-          }
-      }
-      vertexlist
-    }).filter(_._2 != null)
+      if (inputs != null) {
+        val vertexlist = inputs.
+          asInstanceOf[ArrayList[Document]]
+          .asScala
+          .foldLeft(Set[(VertexId, String)]()) {
+          (acc, input) =>
+            val addr = input.getString("address")
+            if (addr != null) {
+              acc + ((addr.hashCode, addr))
+            } else {
+              acc
+            }
+        }
+        vertexlist
+      } else Set[(VertexId, String)]()
+    })
 
     val vertices = verticesWithDup.distinct()
 
@@ -63,11 +68,14 @@ object Clusterizer {
 
     val btcGraph = Graph(vertices, edges, "")
 
-    val cc = RobustConnectedComponents.run(btcGraph, dir=Settings.HDFS_OUT)._1.vertices
+    //val cc = RobustConnectedComponents.run(btcGraph, dir = Settings.HDFS_OUT)._1.vertices
+    val cc = btcGraph.connectedComponents().vertices
 
     val ccByAddr = vertices.join(cc).map {
       case (id, (addr, clusterId)) => (addr, clusterId)
     }
+
+    ccByAddr.cache()
 
     val identities = sc.textFile(Settings.HDFS_DIR + "identities.txt").map { line =>
       val fields = line.split(",")
@@ -138,19 +146,17 @@ object Clusterizer {
   def heuristic1(tx: Document): Set[String] = {
     val inputs = tx.get("vin").asInstanceOf[ArrayList[Document]] asScala
 
-    val addrSet = inputs.foldLeft(Set[String]()) {
-      (acc, input) =>
+    if (inputs != null) {
+      val addrSet = inputs.foldLeft(Set[String]()) {
+        (acc, input) =>
 
-        val addr = input.getString("address")
-        if (addr != null && !"".equals(addr)) {
-          acc + addr
-        } else acc
-
-    }
-
-
-    return addrSet
-
+          val addr = input.getString("address")
+          if (addr != null && !"".equals(addr)) {
+            acc + addr
+          } else acc
+      }
+      return addrSet
+    } else return Set[String]()
   }
 
   /**
@@ -167,24 +173,25 @@ object Clusterizer {
     val inputs = tx.get("vin").asInstanceOf[ArrayList[Document]].asScala
     val outputs = tx.get("vout").asInstanceOf[ArrayList[Document]].asScala
 
+    if (inputs != null && outputs != null) {
+      if (inputs.size == 1 && outputs.size == 1) {
 
-    if (inputs.size == 1 && outputs.size == 1) {
+        val inputAddr = inputs.apply(0).getString("address")
+        val outputAddresses = outputs.apply(0).get("address")
 
-      val inputAddr = inputs.apply(0).getString("address")
-      val outputAddresses = outputs.apply(0).get("address")
+        if (inputAddr != null && outputAddresses != null) {
 
-      if (inputAddr != null && outputAddresses != null) {
+          val inputSet = Set(inputAddr)
 
-        val inputSet = Set(inputAddr)
+          val outputaddr = outputAddresses.asInstanceOf[ArrayList[String]].asScala
 
-        val outputaddr = outputAddresses.asInstanceOf[ArrayList[String]].asScala
+          val outputSet = outputaddr.foldLeft(inputSet) {
+            (acc, addr) =>
+              return acc + addr
+          }
 
-        val outputSet = outputaddr.foldLeft(inputSet) {
-          (acc, addr) =>
-            return acc + addr
+          return outputSet
         }
-
-        return outputSet
       }
     }
 
