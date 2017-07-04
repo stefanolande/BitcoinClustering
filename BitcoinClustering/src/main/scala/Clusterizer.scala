@@ -60,7 +60,7 @@ object Clusterizer {
 
     val edges = rdd.flatMap(tx => {
 
-      val addrSet = heuristic1(tx) ++ heuristic2(tx)
+      val addrSet = heuristic1(tx)
 
       generateEdges(addrSet)
 
