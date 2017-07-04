@@ -20,8 +20,8 @@ object Clusterizer {
       .set("spark.cores.max", "4")
       .set("cores", "4")
       .set("spark.executor.heartbeatInterval", "30s")
-      .set("spark.driver.memory", "6G")
-      .set("spark.executor.memory", "6G")
+      .set("spark.driver.memory", "20G")
+      .set("spark.executor.memory", "20G")
 
     val sc = new SparkContext(conf)
 
@@ -43,14 +43,14 @@ object Clusterizer {
           asInstanceOf[ArrayList[Document]]
           .asScala
           .foldLeft(Set[(VertexId, String)]()) {
-          (acc, input) =>
-            val addr = input.getString("address")
-            if (addr != null) {
-              acc + ((addr.hashCode, addr))
-            } else {
-              acc
-            }
-        }
+            (acc, input) =>
+              val addr = input.getString("address")
+              if (addr != null) {
+                acc + ((hash(addr), addr))
+              } else {
+                acc
+              }
+          }
         vertexlist
       } else Set[(VertexId, String)]()
     })
@@ -60,7 +60,7 @@ object Clusterizer {
 
     val edges = rdd.flatMap(tx => {
 
-      val addrSet = heuristic1(tx) ++ heuristic2(tx)
+      val addrSet = heuristic1(tx)
 
       generateEdges(addrSet)
 
@@ -89,7 +89,7 @@ object Clusterizer {
 
     val outAll = tagged.sortBy(_._2)
 
-    outAll.saveAsTextFile(Settings.HDFS_OUT + "clustersAll.txt")
+    outAll.coalesce(1).saveAsTextFile(Settings.HDFS_OUT + "clustersAll.txt")
 
 
     //Get only the clusters with at least one tag
@@ -97,7 +97,7 @@ object Clusterizer {
       case (addr, (clusterId, tag)) => (addr, clusterId, tag)
     }
 
-    onlyAddrTagged.saveAsTextFile(Settings.HDFS_OUT + "onlytagged.txt")
+    onlyAddrTagged.coalesce(1).saveAsTextFile(Settings.HDFS_OUT + "onlytagged.txt")
 
 
     //First, we filter the clusters with only one address
@@ -127,7 +127,7 @@ object Clusterizer {
       case (addr, (clusterId, Some(tag))) => (addr, clusterId, tag)
     }
 
-    onlyClustersTagged.sortBy(_._2).saveAsTextFile(Settings.HDFS_OUT + "clustersOnlyTagged.txt")
+    onlyClustersTagged.sortBy(_._2).coalesce(1).saveAsTextFile(Settings.HDFS_OUT + "clustersOnlyTagged.txt")
 
   }
 
@@ -211,6 +211,24 @@ object Clusterizer {
          b_ <- addrSet
          if !a_.equals(b_)
     } yield Edge(a_.hashCode, b_.hashCode, "")
+  }
+
+  def hash(string: String): Long = {
+    var h = 1125899906842597L
+    // prime
+    val len = string.length
+    var i = 0
+    while ( {
+      i < len
+    }) {
+      h = 31 * h + string.charAt(i)
+
+      {
+        i += 1;
+        i - 1
+      }
+    }
+    h
   }
 
 }
