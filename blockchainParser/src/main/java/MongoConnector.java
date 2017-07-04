@@ -29,8 +29,8 @@ public class MongoConnector {
     public void connect() {
         if (!connected) {
             MongoCredential credential = MongoCredential.createCredential(Settings.MONGO_USER, Settings.MONGO_DB_NAME, Settings.MONGO_PWD);
-            mongoClient = new MongoClient(new ServerAddress(Settings.MONGO_SERVER_IP, Settings.MONGO_SERVER_PORT), Arrays.asList(credential));
-            //mongoClient = new MongoClient(Settings.MONGO_SERVER_IP, Settings.MONGO_SERVER_PORT);
+            //mongoClient = new MongoClient(new ServerAddress(Settings.MONGO_SERVER_IP, Settings.MONGO_SERVER_PORT), Arrays.asList(credential));
+            mongoClient = new MongoClient(Settings.MONGO_SERVER_IP, Settings.MONGO_SERVER_PORT);
 
             MongoDatabase db = mongoClient.getDatabase(Settings.MONGO_DB_NAME);
             transactionCollection = db.getCollection(Settings.MONGO_COLLECTION_NAME);
@@ -58,7 +58,7 @@ public class MongoConnector {
         }
 
         Document txDoc = new Document("txid", t.getHashAsString());
-        txDoc.append("locktime", t.getLockTime());
+        //txDoc.append("locktime", t.getLockTime());
 
         List<Document> vin = new ArrayList<>();
 
@@ -70,10 +70,10 @@ public class MongoConnector {
 
                 if (!tIn.isCoinBase()) {
                     String txid = tIn.getOutpoint().getHash().toString();
-                    in.append("vout", tIn.getOutpoint().getIndex());
+                    //in.append("vout", tIn.getOutpoint().getIndex());
 
-                    in.append("txid", txid);
-                    in.append("scriptSig", tIn.getScriptSig().toString());
+                    //in.append("txid", txid);
+                    //in.append("scriptSig", tIn.getScriptSig().toString());
 
                     //try to extract the address from the scriptSig - valid only for pay-to-pubkey-hash
                     try {
@@ -88,9 +88,9 @@ public class MongoConnector {
                     }
 
                 } else {
-                    in.append("coinbase", true);
+                    //in.append("coinbase", true);
                 }
-                in.append("sequence", tIn.getSequenceNumber());
+                //in.append("sequence", tIn.getSequenceNumber());
 
 
                 vin.add(in);
@@ -102,10 +102,11 @@ public class MongoConnector {
 
             for (TransactionOutput tOut : t.getOutputs()) {
 
-                Document out = new Document("value", tOut.getValue().getValue());
-                out.append("n", tOut.getIndex());
-                out.append("scriptPubKey", tOut.getScriptPubKey().toString());
-                out.append("type", tOut.getScriptPubKey().getScriptType().toString());
+                Document out = new Document();
+                //out.append("value", tOut.getValue().getValue());
+                //out.append("n", tOut.getIndex());
+                //out.append("scriptPubKey", tOut.getScriptPubKey().toString());
+                //out.append("type", tOut.getScriptPubKey().getScriptType().toString());
 
                 List<String> keys = new ArrayList<>();
 
@@ -122,9 +123,9 @@ public class MongoConnector {
                 }
 
                 if (tOut.getScriptPubKey().isOpReturn()){
-                    out.append("isOpReturn", true);
+                    //out.append("isOpReturn", true);
                     try{
-                        out.append("opReturnData", tOut.getScriptPubKey().getChunks().get(0).data);
+                        //out.append("opReturnData", tOut.getScriptPubKey().getChunks().get(0).data);
                     } catch (Exception e){}
                 }
 
@@ -135,8 +136,8 @@ public class MongoConnector {
             txDoc.append("vout", vout);
 
 
-            txDoc.append("blockhash", block.getHashAsString());
-            txDoc.append("blockheight", height);
+            //txDoc.append("blockhash", block.getHashAsString());
+            //txDoc.append("blockheight", height);
             txDoc.append("time", block.getTimeSeconds());
 
 
@@ -154,6 +155,7 @@ public class MongoConnector {
     protected long getLastBlockTime() {
         //Take the last transaction from the DB
         Document cursor = transactionCollection.find().sort(new BasicDBObject("time", -1)).first();
+        if(cursor==null)return 0;
         return ((long) cursor.get("time"));
     }
 

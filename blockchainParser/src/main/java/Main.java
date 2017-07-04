@@ -59,11 +59,12 @@ public class Main {
 
         // Iterate over the blocks in the blockchain.
         int height = 1;
+        int numberTransaction = 0;
         for (Block block : bfl) {
             height++;
 
             if(height % 1000 == 0){
-                System.out.println("Current block: " + height);
+                System.out.println("Current block: " + height + "     Transaction: "+numberTransaction);
             }
 
             //Se il tempo del blocco corrente è maggiore del tempo dell'utimo blocco presente nel DB, allora iniziamo ad aggiornare il database
@@ -71,8 +72,10 @@ public class Main {
                 //System.out.println("Add Transactions to mongo!");
                 for (Transaction t : block.getTransactions()) {
                     mongo.addTransaction(t, block, height);
+                    numberTransaction++;
                 }
             }
+            if(numberTransaction>20000000)break;
         }
     }
 
