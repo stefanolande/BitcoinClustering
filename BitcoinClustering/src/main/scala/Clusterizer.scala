@@ -17,8 +17,8 @@ object Clusterizer {
     val conf = new SparkConf().setAppName("Clusterizer")
       .set("spark.mongodb.input.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
       .set("spark.mongodb.output.uri", Settings.getMongoUri(MONGO_AUTH_ENABLED))
-      .set("spark.cores.max", "4")
-      .set("cores", "4")
+      .set("spark.cores.max", "6")
+      .set("cores", "6")
       .set("spark.executor.heartbeatInterval", "30s")
       .set("spark.driver.memory", "6G")
       .set("spark.executor.memory", "6G")
@@ -26,7 +26,7 @@ object Clusterizer {
     val sc = new SparkContext(conf)
 
     //carico la collection mongo in un rdd
-    val rdd = MongoSpark.load(sc)
+    val rdd = MongoSpark.load(sc).withPipeline(Seq(Document.parse("{ $match: { time : { $lte : 1309744800 } } }")))
 
     val total_cores = conf.getInt("spark.executor.instances", 1) * conf.getInt("sc._conf.get('spark.executor.cores", 1)
     rdd.coalesce(total_cores * 3)
